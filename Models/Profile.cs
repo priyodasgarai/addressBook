@@ -10,10 +10,9 @@ namespace addressBook.Models
     [Table("Profiles")]
     public class Profile
     {
-        public string AppUserId { get; set; }
         public int Id { get; set; }
-        public AppUser AppUser { get; set; }
+        public string? AppUserId { get; set; }
+        public AppUser? AppUser { get; set; }
         public string? Phone { get; set; }
-
     }
 }

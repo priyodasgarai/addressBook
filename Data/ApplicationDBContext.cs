@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using addressBook.Models;
 using addressBook.Models.Identity;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
@@ -15,7 +16,15 @@ namespace addressBook.Data
         public ApplicationDBContext(DbContextOptions dbContextOptions) : base(dbContextOptions)
         {
         }
-      //  public DbSet<Profile> Profiles { get; set; }
+        
+       public DbSet<Category> categories { get; set; }
+
+        public DbSet<Product> Products { get; set; }
+
+        public DbSet<Brand> Brands { get; set; }
+
+       // public DbSet<Profiles> Profiles { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

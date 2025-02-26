@@ -93,10 +93,10 @@ namespace addressBook.DependencyInjection
 
 
             services.AddScoped<IRoleRepository, RoleRepository>();
-           /* services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
-            services.AddScoped<ICarModelRepository, CarModelRepository>();
-            services.AddScoped<ICarCompanyRepository, CarCompanyRepository>();
+            services.AddScoped<IBrandRepository, BrandRepository>();
+           /* services.AddScoped<ICarCompanyRepository, CarCompanyRepository>();
             services.AddScoped<IPatientRepository, PatientRepository>();
             services.AddScoped<IDoctorRepository, DoctorRepository>();
 
