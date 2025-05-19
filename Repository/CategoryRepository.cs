@@ -15,6 +15,20 @@ namespace addressBook.Repository
             _dbContext = dBContext;
         }
 
+        public async Task<int> CategoryCountAsync(CategoryQueryObject query)
+        {
+            var categories = _dbContext.categories.AsQueryable();
+            if (!string.IsNullOrWhiteSpace(query.Name))
+            {
+                categories = categories.Where(s => s.Name.Contains(query.Name));
+            }
+            if (!string.IsNullOrWhiteSpace(query.Description))
+            {
+                categories = categories.Where(s => s.Description.Contains(query.Description));
+            }
+             return await categories.CountAsync();
+        }
+
         public Task<bool> CategoryExists(int id)
         {
             return _dbContext.categories.AnyAsync(x => x.Id == id);
@@ -34,6 +48,7 @@ namespace addressBook.Repository
             {
                 return null;
             }
+           // return categoryModel;
             _dbContext.categories.Remove(categoryModel);
             await _dbContext.SaveChangesAsync();
             return categoryModel;
@@ -41,6 +56,7 @@ namespace addressBook.Repository
 
         public async Task<List<Category>> GetAllAsync(CategoryQueryObject query)
         {
+            //return await _dbContext.categories.ToListAsync();
             var categories = _dbContext.categories.Include(p => p.Products).AsQueryable();
             if (!string.IsNullOrWhiteSpace(query.Name))
             {
@@ -56,9 +72,13 @@ namespace addressBook.Repository
                 {
                     categories = query.IsDecsending ? categories.OrderByDescending(s => s.Name) : categories.OrderBy(s => s.Name);
                 }
+                if (query.SortBy.Equals("Description", StringComparison.OrdinalIgnoreCase))
+                {
+                    categories = query.IsDecsending ? categories.OrderByDescending(s => s.Description) : categories.OrderBy(s => s.Description);
+                }
             }
 
-            var skipNumber = (query.PageNumber - 1) * query.PageSize;
+            var skipNumber = (query.PageNumber - 1) * query.PageSize;            
             return await categories.Skip(skipNumber).Take(query.PageSize).ToListAsync();
         }
 

@@ -14,8 +14,8 @@ namespace addressBook.Models
         public string Description { get; set; } = string.Empty;
         public int? ParentId { get; set; }
         public string Image { get; set; } = string.Empty;
+        public int Status { get; set; }
         public DateTime CreatedOn { get; set; } = DateTime.Now;
-        public int? Status { get; set; }
         public List<Product> Products { get; set; } = new List<Product>();
     }
 }

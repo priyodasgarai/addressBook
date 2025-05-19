@@ -12,7 +12,7 @@ namespace addressBook.Dtos.Category
         public string Description { get; set; } = string.Empty;
         public int? ParentId { get; set; }
         public string Image { get; set; } = string.Empty;
-        public int? Status { get; set; }
+        public int Status { get; set; }
      
     }
 }

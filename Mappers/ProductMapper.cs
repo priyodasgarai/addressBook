@@ -5,22 +5,28 @@ namespace addressBook.Mappers
     public static class ProductMapper
     {
         public static ProductDto ToProductDto(this Product productModel)
-    
+
         {
-            return new ProductDto {
+            return new ProductDto
+            {
                 Id = productModel.Id,
                 Name = productModel.Name,
                 Description = productModel.Description,
                 CategoryId = (int)productModel.CategoryId,
+                Status = productModel.Status,
                 BrandId = (int)productModel.BrandId,
-                CreatedOn = productModel.CreatedOn,               
+                CreatedOn = productModel.CreatedOn,
+                CategoryName = productModel.Category?.Name,
+                BrandName = productModel.Brand?.Name,         
+                productAttributes = productModel.ProductAttributes.Select(c => c.ToProductAttributeDto()).ToList()
             };
-        } 
+        }
 
         public static Product
         ToProductFromCreateDTO(this CreateProductRequestDto productDTO)
         {
-            return new Product {
+            return new Product
+            {
                 Name = productDTO.Name,
                 Description = productDTO.Description,
                 Status = productDTO.Status,

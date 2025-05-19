@@ -19,6 +19,7 @@ namespace addressBook.Mappers
                 Image = categoryModel.Image,
                 ParentId = categoryModel.ParentId,
                 CreatedOn = categoryModel.CreatedOn,
+                Status=categoryModel.Status,
               //  Products = categoryModel.Products.Select(c => c.ToProductDto()).ToList()
             };
         }
@@ -29,7 +30,8 @@ namespace addressBook.Mappers
                 Name = categoryDTO.Name,
                 Description = categoryDTO.Description,
                 ParentId = categoryDTO.ParentId,
-                Image = categoryDTO.Image
+                Image = categoryDTO.Image,
+                Status = categoryDTO.Status,
             };
         }
     }

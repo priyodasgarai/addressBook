@@ -12,7 +12,7 @@ namespace addressBook.Dtos.Brand
         public string? Image { get; set; }
 
         public DateTime CreatedOn { get; set; } = DateTime.Now;
-        public int? Status { get; set; }
+        public int Status { get; set; }
 
         
     }

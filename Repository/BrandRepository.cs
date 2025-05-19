@@ -19,6 +19,17 @@ namespace addressBook.Repository
             _dbContext = dBContext;
         }
 
+        public async Task<int> BrandCountAsync(BrandQueryObject query)
+        {
+            var brands = _dbContext.Brands.AsQueryable();
+            if (!string.IsNullOrWhiteSpace(query.Name))
+            {
+                brands = brands.Where(s => s.Name.Contains(query.Name));
+            }           
+            return await brands.CountAsync();
+
+        }
+
         public Task<bool> BrandExists(int id)
         {
             return _dbContext.Brands.AnyAsync(x => x.Id == id);
@@ -63,13 +74,14 @@ namespace addressBook.Repository
             return await brands.Skip(skipNumber).Take(query.PageSize).ToListAsync();
         }
 
+
         public async Task<Brand?> GetByIdAsync(int id)
         {
-          //  return await _dbContext.Brands.Include(p => p.Products).FirstOrDefaultAsync(b => b.Id == id);
-          return await _dbContext.Brands.Include(p => p.Products).FirstOrDefaultAsync(c => c.Id == id); 
+            //  return await _dbContext.Brands.Include(p => p.Products).FirstOrDefaultAsync(b => b.Id == id);
+            return await _dbContext.Brands.Include(p => p.Products).FirstOrDefaultAsync(c => c.Id == id);
         }
 
-        public async Task<Brand?> UpdateAsync(int id,UpdateBrandRequestDto brandDto)
+        public async Task<Brand?> UpdateAsync(int id, UpdateBrandRequestDto brandDto)
         {
             var existingBrand = await _dbContext.Brands.FirstOrDefaultAsync(x => x.Id == id);
             if (existingBrand == null)
@@ -78,9 +90,10 @@ namespace addressBook.Repository
             }
             existingBrand.Name = brandDto.Name;
             existingBrand.Image = brandDto.Image;
+            existingBrand.Status = brandDto.Status;
             await _dbContext.SaveChangesAsync();
             return existingBrand;
         }
-    
+
     }
 }

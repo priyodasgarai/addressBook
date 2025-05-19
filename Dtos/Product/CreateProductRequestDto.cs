@@ -18,6 +18,6 @@ namespace addressBook.Dtos.Product
 
         public DateTime CreatedOn { get; set; } = DateTime.Now;
 
-        public int? Status { get; set; }
+        public int Status { get; set; }
     }
 }

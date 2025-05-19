@@ -12,7 +12,7 @@ namespace addressBook.Dtos.Category
         public int? ParentId { get; set; }
         public string Image { get; set; } = string.Empty;
         public DateTime CreatedOn { get; set; } = DateTime.Now;
-        public int? Status { get; set; }
+        public int Status { get; set; }
        
     }
 }

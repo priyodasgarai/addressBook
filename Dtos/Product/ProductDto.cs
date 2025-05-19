@@ -1,7 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+
+
+using addressBook.Dtos.ProductAttribute;
 
 namespace addressBook.Dtos.Product
 {
@@ -19,7 +18,12 @@ namespace addressBook.Dtos.Product
 
         public DateTime CreatedOn { get; set; } = DateTime.Now;
 
-        public int? Status { get; set; }
+        public int Status { get; set; }
+        public string? CategoryName { get; set; } 
+
+        public string? BrandName { get; set; }
+        //public List<CommentDto> Comments{ get; set; } 
+        public List<ProductAttributeDto> productAttributes { get; set; } 
 
     }
 }

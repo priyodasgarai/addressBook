@@ -1,17 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
+using Serilog;
 using addressBook.Dtos.Brand;
 using addressBook.Helpers;
 using addressBook.Interfaces;
 using addressBook.Mappers;
 using CoreApiResponse;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace addressBook.Controllers.Admin
 {
+  //  [Authorize(Roles = "Admin")]
     [ApiController]
     [Route("api/[controller]")]
     public class BrandController : BaseController
@@ -45,7 +44,7 @@ namespace addressBook.Controllers.Admin
             }
             catch (Exception ex)
             {
-                // _logger.LogInformation(ex.Message);
+                _logger.LogInformation(ex.Message);
                 _logger.LogError(ex.Message);
                 return CustomResult(ex.Message, HttpStatusCode.BadRequest);
             }
@@ -95,6 +94,24 @@ namespace addressBook.Controllers.Admin
 
             }
         }
+        [HttpGet]
+        [Route("TotalRecord")]
+        public async Task<IActionResult> TotalRecord([FromQuery] BrandQueryObject query)
+        {
+            try
+            {
+                var brands = await _brandRepo.BrandCountAsync(query);
+
+                return CustomResult("Data loaded successfully", brands, HttpStatusCode.OK);
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return CustomResult(ex.Message, HttpStatusCode.BadRequest);
+
+            }
+        }
         [HttpDelete]
         [Route("{id:int}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
@@ -120,26 +137,30 @@ namespace addressBook.Controllers.Admin
         }
         [HttpPut]
         [Route("{id:int}")]
-        public async Task<IActionResult> Update([FromRoute] int id, [FromForm] UpdateBrandRequestDto brandDto)
+        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateBrandRequestDto brandDto)
         {
             try
             {
                 if (!ModelState.IsValid)
                     return CustomResult("One or more validation errors occurred", ModelState, HttpStatusCode.BadRequest);
-
-                // var brandDetails = await _brandRepo.GetByIdAsync(id);
-                var brandModel = brandDto.ToBrandFromUpdateDto();
-                await _brandRepo.UpdateAsync(id, brandDto);
-
+                var brandModel = await _brandRepo.UpdateAsync(id, brandDto);
                 if (brandModel == null)
                 {
                     return CustomResult("Data not found", HttpStatusCode.NotFound);
                 }
+                // var brandDetails = await _brandRepo.GetByIdAsync(id);
+                // var brandModel = brandDto.ToBrandFromUpdateDto();
+                // await _brandRepo.UpdateAsync(id, brandDto);
+
+                // if (brandModel == null)
+                // {
+                //     return CustomResult("Data not found", HttpStatusCode.NotFound);
+                // }
                 return CustomResult("Data Updated successfully", brandModel.ToBrandDto(), HttpStatusCode.OK);
             }
             catch (Exception ex)
             {
-                // _logger.LogInformation(ex.Message);
+                _logger.LogInformation(ex.Message);
                 _logger.LogError(ex.Message);
                 return CustomResult(ex.Message, HttpStatusCode.BadRequest);
             }

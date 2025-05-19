@@ -16,14 +16,16 @@ namespace addressBook.Data
         public ApplicationDBContext(DbContextOptions dbContextOptions) : base(dbContextOptions)
         {
         }
-        
-       public DbSet<Category> categories { get; set; }
 
+        public DbSet<Category> categories { get; set; }
         public DbSet<Product> Products { get; set; }
-
         public DbSet<Brand> Brands { get; set; }
-
-       // public DbSet<Profiles> Profiles { get; set; }
+        public DbSet<ProductAttribute> ProductAttributes { get; set; }
+        public DbSet<Models.Profile> Profiles { get; set; }
+        public DbSet<Address> Address { get; set; }
+        public DbSet<Cart> Carts { get; set; }
+        public DbSet<OrderHeader> OrderHeaders { get; set; }
+        public DbSet<Order> Orders { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

@@ -5,8 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using addressBook.Data;
 using addressBook.Interfaces;
+using addressBook.Interfaces.Logging;
+using addressBook.Middlewares;
 using addressBook.Models.Identity;
 using addressBook.Repository;
+using addressBook.Service;
+using addressBook.Service.Logging;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -32,7 +36,7 @@ namespace addressBook.DependencyInjection
                         // .UseExceptionProcessor()
                         , ServiceLifetime.Scoped);
 
-            // services.AddScoped(typeof(IAppLogger<>), typeof(SerilogLoggerAdapter<>));
+             services.AddScoped(typeof(IAppLogger<>), typeof(SerilogLoggerAdapter<>));
             /// services.AddScoped<IFileService, FileService>();
             // services.AddScoped<IGenericRepository<Product>, GenericRepository<Product>>();
             // services.AddScoped<IGenericRepository<Category>, GenericRepository<Category>>();
@@ -96,13 +100,20 @@ namespace addressBook.DependencyInjection
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
             services.AddScoped<IBrandRepository, BrandRepository>();
-           /* services.AddScoped<ICarCompanyRepository, CarCompanyRepository>();
-            services.AddScoped<IPatientRepository, PatientRepository>();
-            services.AddScoped<IDoctorRepository, DoctorRepository>();
+            services.AddScoped<IProductAttributeRepository, ProductAttributeRepository>();
+            services.AddScoped<ICartRepository, CartRepository>();
+            services.AddScoped<ITokenService, TokenService>();
 
-            services.AddScoped<IStudentRepository, StudentRepository>();
+            /*  services.AddScoped<IStudentRepository, StudentRepository>();
             services.AddScoped<ISubjectRepository, SubjectRepository>();*/
             return services;
         }
+    
+     public static IApplicationBuilder UseInfrastructructureService(this IApplicationBuilder app)
+        {
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
+            return app;
+        }
+    
     }
 }

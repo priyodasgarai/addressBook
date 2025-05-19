@@ -12,6 +12,6 @@ namespace addressBook.Interfaces
         Task<Category?> UpdateAsync(int id, UpdateCategoryRequestDto categoryDto);
         Task<Category?> DeleteAsync(int id);
          Task<bool> CategoryExists(int id);
-
+        Task<int> CategoryCountAsync(CategoryQueryObject query);
     }
 }

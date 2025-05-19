@@ -12,5 +12,6 @@ namespace addressBook.Interfaces
     Task<Brand?> UpdateAsync(int id, UpdateBrandRequestDto brandDto);
     Task<Brand?> DeleteAsync(int id);
     Task<bool> BrandExists(int id);
+    Task<int> BrandCountAsync(BrandQueryObject query);
     }
 }

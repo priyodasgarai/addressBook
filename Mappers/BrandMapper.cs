@@ -14,6 +14,7 @@ namespace addressBook.Mappers
                 Name = brandModel.Name,
                 Image = brandModel.Image,
                 CreatedOn = brandModel.CreatedOn,
+                Status= brandModel.Status,
                // Products = brandModel.Products.Select(c => c.ToProductDto()).ToList()
             };
         }
@@ -22,7 +23,8 @@ namespace addressBook.Mappers
             return new Brand
             {
                 Name = brandDTO.Name,
-                Image = brandDTO.Image
+                Image = brandDTO.Image,
+                Status=brandDTO.Status,
             };
         }
         public static Brand ToBrandFromUpdateDto(this UpdateBrandRequestDto brandDTO)
@@ -32,6 +34,7 @@ namespace addressBook.Mappers
             {
                 Name = brandDTO.Name,
                 Image = brandDTO.Image,
+                Status=brandDTO.Status,
             };
         }
     }

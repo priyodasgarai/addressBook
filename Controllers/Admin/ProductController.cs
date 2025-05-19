@@ -41,6 +41,7 @@ namespace addressBook.Controllers.Admin
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
             var product = await _productRepo.GetByIdAsync(id);
+            // return Ok(product);
             if (product == null)
             {
                 return CustomResult("Product does not exist",
@@ -52,8 +53,7 @@ namespace addressBook.Controllers.Admin
         }
 
         [HttpPost()]
-        public async Task<IActionResult>
-        Create([FromBody] CreateProductRequestDto productDto)
+        public async Task<IActionResult> Create([FromBody] CreateProductRequestDto productDto)
         {
             try
             {
@@ -61,15 +61,6 @@ namespace addressBook.Controllers.Admin
                     return CustomResult("One or more validation errors occurred",
                     ModelState,
                     HttpStatusCode.BadRequest);
-
-                // if (!await _categoryRepo.CategoryExists(CategoryId))
-                // {
-                //     return CustomResult("Category does not exist", HttpStatusCode.BadRequest);
-                // }
-                // if (!await _brandRepo.BrandExists(BrandId))
-                // {
-                //     return CustomResult("Brand does not exist", HttpStatusCode.BadRequest);
-                // }
                 if (!await _categoryRepo.CategoryExists(productDto.CategoryId))
                 {
                     return CustomResult("Category does not exist",
@@ -124,7 +115,23 @@ namespace addressBook.Controllers.Admin
                 return CustomResult(ex.Message, HttpStatusCode.BadRequest);
             }
         }
+        [HttpGet]
+        [Route("TotalRecord")]
+        public async Task<IActionResult> TotalRecord([FromQuery] ProductQueryObject query)
+        {
+            try
+            {
+                var product = await _productRepo.ProductCountAsync(query);
+                return CustomResult("Data loaded successfully", product, HttpStatusCode.OK);
 
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return CustomResult(ex.Message, HttpStatusCode.BadRequest);
+
+            }
+        }
         [HttpDelete]
         [Route("{id:int}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
@@ -175,8 +182,7 @@ namespace addressBook.Controllers.Admin
                     return CustomResult("Brand does not exist",
                     HttpStatusCode.BadRequest);
                 }
-                var productModel =
-                    await _productRepo.UpdateAsync(id, productDto);
+                var productModel =               await _productRepo.UpdateAsync(id, productDto);
                 if (productModel == null)
                 {
                     return CustomResult("Data not found",

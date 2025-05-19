@@ -12,5 +12,6 @@ namespace addressBook.Interfaces
         Task<Product?> GetByIdAsync(int id);
         Task<Product?> DeleteAsync(int id);
         Task<bool> ProductExists(int id);
+        Task<int> ProductCountAsync(ProductQueryObject query);
     }
 }

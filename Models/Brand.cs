@@ -10,14 +10,10 @@ namespace addressBook.Models
     public class Brand
     {
         public int Id { get; set; }
-
         public string Name { get; set; } = string.Empty;
-
         public string? Image { get; set; }
-
         public DateTime CreatedOn { get; set; } = DateTime.Now;
-        public int? Status { get; set; }
-
-         public List<Product> Products { get; set; } = new List<Product>();
+        public int Status { get; set; }
+        public List<Product> Products { get; set; } = new List<Product>();
     }
 }

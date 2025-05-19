@@ -9,7 +9,7 @@ namespace addressBook.Dtos.Brand
     {
        public string Name { get; set; } = string.Empty;
         public string? Image { get; set; }      
-        public int? Status { get; set; }
+        public int Status { get; set; }
 
     }
 }

@@ -8,10 +8,12 @@ using System.Text;
 using System.Threading.Tasks;
 using addressBook.Dtos.Identity;
 using addressBook.Helpers;
+using addressBook.Interfaces;
 using addressBook.Models.Identity;
 using CoreApiResponse;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 namespace addressBook.Controllers.Auth
@@ -21,14 +23,26 @@ namespace addressBook.Controllers.Auth
     public class AccountController : BaseController
     {
         private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly UserManager<AppUser> _userManager;
-
-        private readonly IConfiguration _configuration;
-        public AccountController(IConfiguration configuration, RoleManager<IdentityRole> roleManager, UserManager<AppUser> userManager)
+        private readonly UserManager<AppUser> _userManager;       
+        private readonly ITokenService _tokenService;
+        private readonly IConfiguration _configuration;       
+        private readonly ILogger<AccountController> _logger;
+      
+        public AccountController(IConfiguration configuration, 
+            RoleManager<IdentityRole> roleManager,
+            UserManager<AppUser> userManager,           
+            ITokenService tokenService, 
+            ILogger<AccountController> logger)
+        
         {
             _userManager = userManager;
             _configuration = configuration;
             _roleManager = roleManager;
+            _tokenService = tokenService;
+           
+           
+
+            _logger = logger;
         }
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto model)
@@ -46,18 +60,7 @@ namespace addressBook.Controllers.Auth
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, new Response { Message = "User email already exists!" });
                 // return CustomResult("Invalid Email Id ", HttpStatusCode.BadRequest);
-            }
-
-            /*  var user = new IdentityUser
-              {
-                  UserName = model.Username,
-                  Email = model.Email
-              };
-                 if(user!=null){
-                     return CustomResult("UserName or Email Id aldeady exited",  HttpStatusCode.BadRequest);
-                 } 
-                  //  return CustomResult("uaer",user);
-                 */
+            }          
             var appUser = new AppUser
             {
                 UserName = model.Username,
@@ -82,43 +85,55 @@ namespace addressBook.Controllers.Auth
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto model)
         {
-            var user = await _userManager.FindByEmailAsync(model.Email);
-            if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
+            try
             {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
+                {
 
-                var userRoles = await _userManager.GetRolesAsync(user);
-                var authClaims = new List<Claim>{
-                    new Claim(ClaimTypes.Name, user.UserName),
-                    new Claim(ClaimTypes.Email,user.Email),
-                    new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
+                    var userRoles = await _userManager.GetRolesAsync(user);
+                    var authClaims = new List<Claim>{
+            new Claim(ClaimTypes.Name, user.UserName),
+            new Claim(ClaimTypes.Email,user.Email),
+             new Claim(JwtRegisteredClaimNames.GivenName,user.UserName),
+            new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
+            };
+                    foreach (var userRole in userRoles)
+                    {
+                        authClaims.Add(new Claim(ClaimTypes.Role, userRole));
+                    }
+
+
+                    // authClaims.AddRange(userRoles.Select(role => new Claim(ClaimTypes.Role, role)));
+                    var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Signingkey"]));
+                    var token = new JwtSecurityToken(
+                                       issuer: _configuration["JWT:Issuer"],
+                                       audience: _configuration["JWT:Audience"],
+                                       expires: DateTime.Now.AddHours(3),
+                                       claims: authClaims,
+                                       signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
+                                   );
+
+                    var newUser = new NewUserDto
+                    {
+                        UserName = user.UserName,
+                        Email = user.Email,
+                        // Roles=userRoles.ToList().,
+                        Token = new JwtSecurityTokenHandler().WriteToken(token)
                     };
-                foreach (var userRole in userRoles)
-                {
-                    authClaims.Add(new Claim(ClaimTypes.Role, userRole));
+                    //return StatusCode(StatusCodes.Status200OK, new Response {Status=true, Message = "User login Successfully!",Data = newUser});
+                    return CustomResult("User login Successfully", newUser, HttpStatusCode.OK);
                 }
+                return CustomResult("Invalid username", HttpStatusCode.BadRequest);
 
-
-                // authClaims.AddRange(userRoles.Select(role => new Claim(ClaimTypes.Role, role)));
-                var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Signingkey"]));
-                var token = new JwtSecurityToken(
-                                   issuer: _configuration["JWT:Issuer"],
-                                   audience: _configuration["JWT:Audience"],
-                                   expires: DateTime.Now.AddHours(3),
-                                   claims: authClaims,
-                                   signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
-                               );
-
-                var newUser = new NewUserDto
-                {
-                    UserName = user.UserName,
-                    Email = user.Email,
-                    //  Roles=userRoles.ToList().,
-                    Token = new JwtSecurityTokenHandler().WriteToken(token)
-                };
-
-                return CustomResult("User login Successfully", newUser, HttpStatusCode.OK);
             }
-            return CustomResult("Invalid username", HttpStatusCode.Unauthorized);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return CustomResult(ex.Message, HttpStatusCode.BadRequest);
+            }
 
         }
         [HttpDelete]
