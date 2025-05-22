@@ -12,7 +12,7 @@ namespace addressBook.Models
         public string AppUserId { get; set; }      
         public int Quantity { get; set; }       
         public bool IsOrder { get; set; } = false;
-        public int Status { get; set; }
+        public int Status { get; set; } = 0;
         public DateTime CreatedOn { get; set; } = DateTime.Now;
         public ProductAttribute? ProductAttribute { get; set; }
         public AppUser? AppUser { get; set; }

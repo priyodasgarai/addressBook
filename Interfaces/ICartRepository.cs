@@ -18,5 +18,8 @@ namespace addressBook.Interfaces
         Task<List<Cart>> GetByUserIdAsync(AppUser appUser);
         Task<Cart?> DeleteAsync(int id);
         Task<bool> CartExists(int id);
+        Task<Cart?> ProductExit(int productAttributeId, string userId);
+        Task<Cart?> UpdateQuantityAsync(int id, int quantity);
+
     }
 }

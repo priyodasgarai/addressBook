@@ -30,7 +30,7 @@ namespace addressBook.Repository
         public async Task<Cart?> DeleteAsync(int id)
         {
             var cartDetails = await _dbContext.Carts.FirstOrDefaultAsync(c => c.Id == id);
-            if (cartDetails != null) {
+            if (cartDetails == null) {
                 return null;
                     }
             _dbContext.Carts.Remove(cartDetails);
@@ -50,7 +50,13 @@ namespace addressBook.Repository
 
         public async Task<List<Cart>> GetByUserIdAsync(AppUser appUser)
         {
-            return await _dbContext.Carts.Include(a => a.ProductAttribute).ThenInclude(p => p.Product).Where(c => c.AppUserId == appUser.Id).ToListAsync();
+            return await _dbContext.Carts.Include(a => a.ProductAttribute).ThenInclude(p => p.Product).Where(c => c.AppUserId == appUser.Id).Where(c => c.IsOrder==false).ToListAsync();
+        }
+
+        public async Task<Cart?> ProductExit(int productAttributeId, string userId)
+        {
+            return await _dbContext.Carts.FirstOrDefaultAsync(c => c.ProductAttributeId == productAttributeId && c.AppUserId == userId && c.IsOrder==false);
+            
         }
 
         public async Task<Cart?> UpdateAsync(int id, UpdateCartRequestDto cartRequestDto)
@@ -63,6 +69,18 @@ namespace addressBook.Repository
             cartDetails.Quantity = cartRequestDto.Quantity;
             cartDetails.IsOrder = cartRequestDto.IsOrder;
             cartDetails.Status = cartRequestDto.Status;
+            await _dbContext.SaveChangesAsync();
+            return cartDetails;
+        }
+
+        public async Task<Cart?> UpdateQuantityAsync(int id, int quantity)
+        {
+            var cartDetails = await _dbContext.Carts.FirstOrDefaultAsync(c => c.Id == id);
+            if (cartDetails == null)
+            {
+                return null;
+            }
+            cartDetails.Quantity = quantity;           
             await _dbContext.SaveChangesAsync();
             return cartDetails;
         }

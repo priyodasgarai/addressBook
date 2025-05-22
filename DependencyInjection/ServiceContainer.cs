@@ -40,7 +40,10 @@ namespace addressBook.DependencyInjection
             /// services.AddScoped<IFileService, FileService>();
             // services.AddScoped<IGenericRepository<Product>, GenericRepository<Product>>();
             // services.AddScoped<IGenericRepository<Category>, GenericRepository<Category>>();
-
+            services.AddControllersWithViews()
+                .AddNewtonsoftJson(options =>
+                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+            );
             return services;
         }
 

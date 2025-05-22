@@ -23,15 +23,13 @@ namespace addressBook.Mappers
                 Size=(int)cartModel.ProductAttribute?.Size,
             };
         }
-        public static Cart ToCartCreateDTO(this CreateCartRequestDto cartRequestDto)
-        {
-            return new Cart
-            {
-                ProductAttributeId = cartRequestDto.ProductAttributeId,
-                AppUserId = cartRequestDto.AppUserId,
-                Quantity = cartRequestDto.Quantity,
+        //public static Cart ToCartCreateDTO(this CreateCartRequestDto cartRequestDto)
+        //{
+        //    return new Cart
+        //    {
+        //        ProductAttributeId = cartRequestDto.ProductAttributeId,               
                
-            };
-        }
+        //    };
+        //}
     }
 }

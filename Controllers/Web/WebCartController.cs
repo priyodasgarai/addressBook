@@ -1,7 +1,9 @@
 ﻿using addressBook.Dtos.Carts;
+using addressBook.Dtos.Category;
 using addressBook.Extension;
 using addressBook.Interfaces;
 using addressBook.Mappers;
+using addressBook.Models;
 using addressBook.Models.Identity;
 using CoreApiResponse;
 using Microsoft.AspNetCore.Authorization;
@@ -96,21 +98,136 @@ namespace addressBook.Controllers.Web
         }
 
         [HttpPost()]
-        public async Task<IActionResult> Create( [FromBody] CreateCartRequestDto cartRequestDto)
+        public async Task<IActionResult> Create([FromBody]CreateCartRequestDto CartRequestDto)
         {
             try
             {      
                 if (!ModelState.IsValid)
                     return CustomResult("One or more validation errors occurred", ModelState, HttpStatusCode.BadRequest);
 
-                var cartModel = cartRequestDto.ToCartCreateDTO();
-              
+                var username = User.GetUsername();
+                var appUser = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == username);
+                if (appUser == null)
+                {
+                    return CustomResult("User not found", HttpStatusCode.NotFound);
+                }
+            //    return CustomResult("Data attributeId", CartRequestDto.ProductAttributeId, HttpStatusCode.OK);
+                var cartModel = new Cart
+                {
+                    ProductAttributeId = CartRequestDto.ProductAttributeId,
+                    AppUserId = appUser.Id,
+                    Quantity = 1                   
+                };
+              //  return CustomResult("Data added successfully", cartModel,HttpStatusCode.OK);
+                var productDetails = await _cartRepo.ProductExit(CartRequestDto.ProductAttributeId, appUser.Id);             
+
+                if (productDetails != null) {                   
+                    if(productDetails.Quantity <= 4) {
+                        var Quantity = productDetails.Quantity + 1;               
+                        var UpdateCartModel = await _cartRepo.UpdateQuantityAsync(productDetails.Id, Quantity);
+                    return CustomResult("Data Update successfully", UpdateCartModel, HttpStatusCode.OK);
+                    }
+                    else {
+                        return CustomResult("You can add max five product", productDetails, HttpStatusCode.Conflict);
+                    }
+                }
+            
                 await _cartRepo.CreateAsync(cartModel);
-                var result = CreatedAtAction(nameof(GetById), new { id = cartModel.Id }, cartModel.ToCartDto());
-                return CustomResult("Data added successfully", result.Value, HttpStatusCode.OK);
+                return CustomResult("Data added successfully",  HttpStatusCode.OK);                
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex.Message);
+                return CustomResult(ex.Message, HttpStatusCode.BadRequest);
+            }
+        }
+        [HttpPost()]
+        [Route("Decrease-Card")]
+ public async Task<IActionResult> decreaseCard([FromBody] CreateCartRequestDto CartRequestDto)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                    return CustomResult("One or more validation errors occurred", ModelState, HttpStatusCode.BadRequest);
+
+                var username = User.GetUsername();
+                var appUser = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == username);
+                if (appUser == null)
+                {
+                    return CustomResult("User not found", HttpStatusCode.NotFound);
+                }
+                var productDetails = await _cartRepo.ProductExit(CartRequestDto.ProductAttributeId, appUser.Id);
+
+                if (productDetails == null)
+                {
+                    return CustomResult("Item not found", HttpStatusCode.NotFound);
+                }
+
+
+                if (productDetails.Quantity > 1 )
+                {
+                    var Quantity = productDetails.Quantity - 1;
+                    var UpdateCartModel = await _cartRepo.UpdateQuantityAsync(productDetails.Id, Quantity);
+                    return CustomResult("Data Update successfully", UpdateCartModel, HttpStatusCode.OK);
+                }
+                else if (productDetails.Quantity == 1) {
+                    var cartModel = await _cartRepo.DeleteAsync(productDetails.Id);
+                    if (cartModel == null)
+                    {
+                        return CustomResult("Data not found", HttpStatusCode.NotFound);
+                    }
+
+                    return CustomResult("Data delete successfully", HttpStatusCode.OK);
+                }
+                else {
+                    return CustomResult("You can add max five product", productDetails, HttpStatusCode.Conflict);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return CustomResult(ex.Message, HttpStatusCode.BadRequest);
+            }
+        }
+        [HttpDelete]
+        [Route("{id:int}")]
+        public async Task<IActionResult> Delete([FromRoute] int id)
+        {
+            try
+            {
+                var cartModel = await _cartRepo.DeleteAsync(id);                
+                if (cartModel == null)
+                {
+                    return CustomResult("Data not found", HttpStatusCode.NotFound);
+                }
+
+                return CustomResult("Data delete successfully", HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                // _logger.LogInformation(ex.Message);
+                _logger.LogError(ex.Message);
+                return CustomResult(ex.Message, HttpStatusCode.BadRequest);
+            }
+        }
+        [HttpPut]
+        [Route("{id:int}")]
+        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateCartRequestDto cartRequestDto)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                    return CustomResult("One or more validation errors occurred", ModelState, HttpStatusCode.BadRequest);
+                var cartModel = await _cartRepo.UpdateAsync(id, cartRequestDto);
+                if (cartModel == null)
+                {
+                    return CustomResult("Data not found", HttpStatusCode.NotFound);
+                }
+                return CustomResult("Data Updated successfully", cartModel.ToCartDto(), HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                // _logger.LogInformation(ex.Message);
                 _logger.LogError(ex.Message);
                 return CustomResult(ex.Message, HttpStatusCode.BadRequest);
             }
