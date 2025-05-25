@@ -107,6 +107,9 @@ namespace addressBook.DependencyInjection
             services.AddScoped<ICartRepository, CartRepository>();
             services.AddScoped<ITokenService, TokenService>();
 
+            services.AddScoped<IAddressRepository, AddressRepositor>();
+            services.AddScoped<IOrderRepository, OrderRepository>();
+            services.AddScoped<IOrderHeaderRepository, OrderHeaderRepository>();
             /*  services.AddScoped<IStudentRepository, StudentRepository>();
             services.AddScoped<ISubjectRepository, SubjectRepository>();*/
             return services;

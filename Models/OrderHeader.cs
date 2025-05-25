@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 using addressBook.Models.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace addressBook.Models
 {
@@ -17,7 +18,8 @@ namespace addressBook.Models
         public decimal? ProductPrice { get; set; }
         public int Quantity { get; set; }
         public decimal? Amount { get; set; }
-        public bool IsOrder { get; set; } = false;
+
+        [Comment("0=Deactivate,1=Active")]
         public int Status { get; set; }
         public DateTime CreatedOn { get; set; } = DateTime.Now;
         public Order? Order { get; set; }

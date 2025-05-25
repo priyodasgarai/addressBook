@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -18,6 +19,7 @@ namespace addressBook.Models
         public int StockQuantity { get; set; }
         public decimal? Price { get; set; }
         public bool IsDefault { get; set; } = false;
+        [Comment("0=Deactivate,1=Active")]
         public int Status { get; set; }
         public DateTime CreatedOn { get; set; } = DateTime.Now;
         public Product? Product { get; set; }

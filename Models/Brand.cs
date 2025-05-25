@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -13,6 +14,7 @@ namespace addressBook.Models
         public string Name { get; set; } = string.Empty;
         public string? Image { get; set; }
         public DateTime CreatedOn { get; set; } = DateTime.Now;
+        [Comment("0=Deactivate,1=Active")]
         public int Status { get; set; }
         public List<Product> Products { get; set; } = new List<Product>();
     }
